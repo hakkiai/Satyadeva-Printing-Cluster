@@ -1,0 +1,549 @@
+create database admin_portal;
+
+use admin_portal;
+
+/*Users Table*/
+CREATE TABLE users (
+    id int AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(50) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    role ENUM('reception', 'accounts', 'admin', 'super_admin') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    active TINYINT(1) DEFAULT 1
+);
+
+/*Insert into users table*/
+INSERT INTO USERS(username,password,role,email) values('admin','admin','admin','admin@example.com');
+INSERT INTO USERS(username,password,role,email) values('superadmin','superadmin','super_admin','superadmin@example.com');
+INSERT INTO USERS(username,password,role,email) values('reception','reception','reception','reception@example.com');
+INSERT INTO USERS(username,password,role,email) values('ctp','ctp','ctp','ctp@example.com');
+INSERT INTO USERS(username,password,role,email) values('accounts','accounts','accounts','accounts@example.com');
+INSERT INTO USERS(username,password,role,email) values('multicolour','multicolour','multicolour','multicolour@example.com');
+INSERT INTO USERS(username,password,role,email) values('delivery','delivery','delivery','delivery@example.com');
+INSERT INTO users (username, password, role, email) 
+VALUES ('dispatch', 'dispatch', 'dispatch', 'dispatch@example.com');
+ALTER TABLE users 
+MODIFY role ENUM('admin', 'super_admin', 'reception', 'ctp', 'accounts', 'multicolour','delivery') NOT NULL;
+ALTER TABLE job_sheets 
+ADD COLUMN ctp TINYINT(1) DEFAULT 0,
+ADD COLUMN multicolour TINYINT(1) DEFAULT 0,
+ADD COLUMN description TEXT,
+ADD COLUMN file_path VARCHAR(255);
+ALTER TABLE job_sheets 
+ADD COLUMN completed TINYINT(1) DEFAULT 0;
+
+ALTER TABLE job_sheets 
+MODIFY COLUMN file_path VARCHAR(500);
+ALTER TABLE job_sheets
+ADD COLUMN payment_status VARCHAR(20) DEFAULT NULL,
+ADD COLUMN payment_type VARCHAR(20) DEFAULT NULL,
+ADD COLUMN cash_amount DECIMAL(10,2) DEFAULT 0.00,
+ADD COLUMN credit_amount DECIMAL(10,2) DEFAULT 0.00,
+ADD COLUMN partial_amount DECIMAL(10,2) DEFAULT 0.00;
+
+ALTER TABLE job_sheets
+ADD COLUMN payment_status VARCHAR(20) DEFAULT NULL,
+ADD COLUMN cash_amount DECIMAL(10,2) DEFAULT 0.00,
+ADD COLUMN credit_amount DECIMAL(10,2) DEFAULT 0.00,
+ADD COLUMN partial_amount DECIMAL(10,2) DEFAULT 0.00;
+
+ALTER TABLE job_sheets
+DROP COLUMN payment_type;
+
+
+ALTER TABLE job_sheets
+ADD COLUMN completed_ctp TINYINT(1) DEFAULT 0,
+ADD COLUMN completed_multicolour TINYINT(1) DEFAULT 0;
+CREATE TABLE payment_records (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    job_sheet_id INT NOT NULL,
+    job_sheet_name VARCHAR(255) NOT NULL,
+    date DATETIME NOT NULL,
+    cash DECIMAL(10, 2) DEFAULT 0.00,
+    credit DECIMAL(10, 2) DEFAULT 0.00,
+    balance DECIMAL(10, 2) DEFAULT 0.00,
+    payment_status ENUM('partially_paid', 'completed') DEFAULT 'partially_paid',
+    FOREIGN KEY (job_sheet_id) REFERENCES job_sheets(id) ON DELETE CASCADE
+);
+
+ALTER TABLE job_sheets
+ADD COLUMN completed_delivery TINYINT(1) DEFAULT 0;
+CREATE TABLE pricing_table (
+    category VARCHAR(50) PRIMARY KEY,
+    member_first INT NOT NULL,
+    member_next INT NOT NULL,
+    non_member_first INT NOT NULL,
+    non_member_next INT NOT NULL
+);
+
+INSERT INTO pricing_table (category, member_first, member_next, non_member_first, non_member_next) VALUES
+('DC', 2300, 400, 2500, 500),
+('DD', 1800, 350, 1900, 400),
+('SDD', 2300, 400, 2500, 500),
+('Web', 1300, 150, 1450, 200),
+('RYOBI', 400, 100, 400, 150),
+('RYOBI_COLOR', 500, 150, 500, 200);
+
+CREATE TABLE upi_settings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    upi_id VARCHAR(255) NOT NULL,
+    payee_name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert a sample UPI detail (replace with your actual values)
+INSERT INTO upi_settings (upi_id, payee_name) 
+VALUES ('9704800363@axl', 'SSK');
+
+ALTER TABLE upi_settings
+ADD COLUMN paper_charges_upi_id VARCHAR(255) AFTER upi_id;
+
+SET SQL_SAFE_UPDATES = 0;
+
+UPDATE upi_settings
+SET paper_charges_upi_id = '9704800363@ptyes'
+WHERE upi_id = '9704800363@axl';
+SET SQL_SAFE_UPDATES = 1;
+select * from users;
+
+CREATE TABLE inventory_items_copy (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    item_name VARCHAR(255) NOT NULL,
+    subcategory_id INTEGER,
+    quantity DECIMAL(10,2) DEFAULT 0,
+    unit VARCHAR(50),
+    utilised_quantity DECIMAL(10,2) DEFAULT 0,
+    balance DECIMAL(10,2) GENERATED ALWAYS AS (quantity - utilised_quantity) STORED,
+    active_status TINYINT(1) DEFAULT 1
+);
+
+INSERT INTO inventory_items_copy 
+(id, item_name, subcategory_id, quantity, unit, utilised_quantity)
+SELECT 
+id, item_name, subcategory_id, quantity, unit, 0 
+FROM inventory_items;
+
+
+
+DELIMITER //
+
+CREATE TRIGGER update_active_status
+BEFORE UPDATE ON `inventory_items_copy`
+FOR EACH ROW
+BEGIN
+    IF (NEW.`quantity` - NEW.`utilised_quantity`) <= 0 THEN
+        SET NEW.`active_status` = 0;
+    ELSE
+        SET NEW.`active_status` = 1;
+    END IF;
+END//
+
+DELIMITER ;
+SELECT VERSION();
+
+
+SELECT selling_price FROM sales_prices WHERE item_id = [your_item_id] LIMIT 1;payment_records
+
+/*Vendors Table*/
+CREATE TABLE vendors(
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    vendor_name VARCHAR(255) NOT NULL,
+    phone_number VARCHAR(20),
+    email VARCHAR(255),
+    gst_number VARCHAR(50),
+    hsn_number VARCHAR(50),
+    invoice_number VARCHAR(50),
+    date_of_supply  DATE
+);
+
+/*Customers Table*/
+CREATE TABLE customers (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    customer_name VARCHAR(255) UNIQUE NOT NULL,
+    firm_name VARCHAR(255) NOT NULL,
+    firm_location VARCHAR(255) NOT NULL,
+    gst_number VARCHAR(50) NOT NULL,
+    email VARCHAR(255),
+    phone_number VARCHAR(20) NOT NULL,
+    address TEXT
+);
+ALTER TABLE customers ADD COLUMN member_status TINYINT(1) DEFAULT 0;
+UPDATE customers SET member_status = 1 WHERE customer_name = 'karthikeya';
+
+/*Inventory Categories Table*/
+CREATE TABLE inventory_categories (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    category_name VARCHAR(255) NOT NULL
+);
+
+INSERT INTO inventory_categories (category_name) VALUES 
+('Paper'),
+('Plates'),
+('Ink');
+
+/*Inventory SubCategories Table*/
+CREATE TABLE inventory_subcategories (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    subcategory_name VARCHAR(255) NOT NULL,
+    category_id INTEGER,
+    FOREIGN KEY (category_id) REFERENCES inventory_categories(id)
+);
+
+
+INSERT INTO inventory_subcategories(subcategory_name, category_id) VALUES('White Paper', 1);
+INSERT INTO inventory_subcategories(subcategory_name, category_id) VALUES ('Maplito', 1);
+INSERT INTO inventory_subcategories(subcategory_name, category_id) VALUES ('Hardpaper D/D', 1);
+INSERT INTO inventory_subcategories(subcategory_name, category_id) VALUES ('Hardpaper D/C', 1);
+INSERT INTO inventory_subcategories(subcategory_name, category_id) VALUES ('Halfset', 2);
+INSERT INTO inventory_subcategories(subcategory_name, category_id) VALUES ('Multicolor', 3);
+INSERT INTO inventory_subcategories(subcategory_name, category_id) VALUES ('Single Color', 3);
+
+
+/*Inventory Items Table*/
+CREATE TABLE inventory_items (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    item_name VARCHAR(255) NOT NULL,
+    subcategory_id INTEGER,
+    quantity DECIMAL(10,2) DEFAULT 0,
+    unit VARCHAR(50),
+    FOREIGN KEY (subcategory_id) REFERENCES inventory_subcategories(id)
+);
+
+INSERT INTO inventory_items (item_name, subcategory_id, quantity, unit) VALUES
+('7.2 kg (dummy)', 1, 0, 'kg'),
+('8 kg (DFC)', 1, 0, 'kg'),
+('10.5 kg (Double Crown)', 1, 0, 'kg'),
+('9 kg (dummy)', 2, 0, 'kg'),
+('10 kg (DFC)', 2, 0, 'kg'),
+('13.6 kg (Double Crown)', 2, 0, 'kg'),
+('90 GSM', 3, 0, 'GSM'),
+('130 GSM', 3, 0, 'GSM'),
+('170 GSM', 3, 0, 'GSM'),
+('250 GSM', 3, 0, 'GSM'),
+('300 GSM', 3, 0, 'GSM'),
+('90 GSM', 4, 0, 'GSM'),
+('130 GSM', 4, 0, 'GSM'),
+('170 GSM', 4, 0, 'GSM'),
+('700 x 945', 5, 0, 'piece'),
+('610 x 890', 5, 0, 'piece'),
+('605 x 760', 5, 0, 'piece'),
+('560 x 670', 5, 0, 'piece'),
+('335 x 485', 5, 0, 'piece'),
+('Cyan', 6, 0, 'kg'),
+('Magenta', 6, 0, 'kg'),
+('Yellow', 6, 0, 'kg'),
+('Black', 6, 0, 'kg'),
+('Web Ink', 7, 0, 'kg'),
+('Black (Well Print)', 7, 0, 'kg'),
+('Royale Blue', 7, 0, 'kg'),
+('Green', 7, 0, 'kg'),
+('Red', 7, 0, 'kg'),
+('Brown', 7, 0, 'kg'),
+('Yellow', 7, 0, 'kg');
+
+ CREATE TABLE inventory (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    vendor_id INT NOT NULL,
+    item_id INT NOT NULL,
+    quantity INT NOT NULL,
+    price_per_unit DECIMAL(10, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (vendor_id) REFERENCES vendors(id) ON DELETE RESTRICT,
+    FOREIGN KEY (item_id) REFERENCES inventory_items(id)
+);
+
+/*Sales Charges Table*/
+CREATE TABLE sales_prices (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    item_id INT NOT NULL,
+    selling_price DECIMAL(10, 2) NOT NULL,
+    quantity_per_unit INT NOT NULL,
+    unit_type VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (item_id) REFERENCES inventory_items(id)
+);
+
+CREATE TABLE customer_jobs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_name VARCHAR(255),
+    phone_number VARCHAR(20),
+    job_name VARCHAR(255),
+    paper_subcategory VARCHAR(255),
+    type VARCHAR(255),
+    quantity INT,
+    printing_type VARCHAR(255),
+    striking INT,
+    machine VARCHAR(50),
+    ryobi_type VARCHAR(50),
+    web_type VARCHAR(50),
+    web_size INT,
+    ctp_plate VARCHAR(50),
+    ctp_quantity INT,
+    customer_type VARCHAR(50),
+    paper_charges DECIMAL(10,2),
+    plating_charges DECIMAL(10,2),
+    lamination_charges DECIMAL(10,2),
+    pinning_charges DECIMAL(10,2),
+    binding_charges DECIMAL(10,2),
+    finishing_charges DECIMAL(10,2),
+    other_charges DECIMAL(10,2),
+    discount DECIMAL(10,2),
+    total_charges DECIMAL(10,2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE job_sheets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_name VARCHAR(255) NOT NULL,
+    phone_number VARCHAR(15) NOT NULL,
+    job_name VARCHAR(255) NOT NULL,
+    paper_subcategory INT,
+    type VARCHAR(255),
+    quantity INT,
+    striking VARCHAR(50),
+    machine VARCHAR(50),
+    ryobi_type VARCHAR(50),
+    web_type VARCHAR(50),
+    web_size INT,
+    ctp_plate VARCHAR(50),
+    ctp_quantity INT,
+    plating_charges DECIMAL(10,2),
+    paper_charges DECIMAL(10,2),
+    printing_charges DECIMAL(10,2),
+    lamination_charges DECIMAL(10,2),
+    pinning_charges DECIMAL(10,2),
+    binding_charges DECIMAL(10,2),
+    finishing_charges DECIMAL(10,2),
+    other_charges DECIMAL(10,2),
+    discount DECIMAL(10,2),
+    total_charges DECIMAL(10,2),
+    status ENUM('Draft','Approved', 'Finalized') NOT NULL DEFAULT 'Draft',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+SET SQL_SAFE_UPDATES = 0;
+update inventory_items_copy set quantity=100 where item_name='7.2 kg (dummy)';
+update inventory_items_copy set utilised_quantity=100 where item_name='7.2 kg (dummy)';
+SET SQL_SAFE_UPDATES = 1;
+
+drop table inventory;
+
+CREATE TABLE inventory (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    invoice_number INT NOT NULL,
+    vendor_id INT NOT NULL,
+    item_id INT NOT NULL,
+    quantity INT NOT NULL,
+    price_per_unit DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (invoice_number) REFERENCES invoice(invoice_number) ON DELETE CASCADE,
+    FOREIGN KEY (vendor_id) REFERENCES vendors(id) ON DELETE RESTRICT,
+    FOREIGN KEY (item_id) REFERENCES inventory_items(id)
+);
+
+CREATE TABLE invoice (
+    invoice_number INT AUTO_INCREMENT PRIMARY KEY
+);
+
+
+
+ALTER TABLE payment_records
+ADD COLUMN payment_type ENUM('check', 'online', 'cash', 'phonepe', 'credit') DEFAULT 'cash' AFTER payment_status;
+
+
+SELECT id, total_charges
+FROM job_sheets
+WHERE id = 43;
+
+select * from customers;
+
+ALTER TABLE customers
+ADD COLUMN is_member ENUM('member', 'non-member') NOT NULL;
+
+
+ALTER TABLE payment_records
+MODIFY COLUMN payment_status ENUM('incomplete', 'partially_paid', 'completed', 'partially_paid_credit') NOT NULL DEFAULT 'partially_paid';
+
+ALTER TABLE job_sheets
+MODIFY COLUMN payment_status ENUM('incomplete', 'partially_paid', 'completed', 'partially_paid_credit') NOT NULL DEFAULT 'incomplete';
+
+SELECT DISTINCT payment_status FROM payment_records;
+SET SQL_SAFE_UPDATES = 0;
+
+
+ALTER TABLE payment_records
+MODIFY COLUMN payment_status VARCHAR(500) NOT NULL DEFAULT 'partially_paid';
+
+DESCRIBE payment_records;
+DESCRIBE job_sheets;
+
+drop table payment_records;
+
+CREATE TABLE payment_records (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    job_sheet_id INT NOT NULL,
+    job_sheet_name VARCHAR(255) NOT NULL,
+    date DATETIME NOT NULL,
+    cash DECIMAL(10, 2) DEFAULT 0.00,
+    credit DECIMAL(10, 2) DEFAULT 0.00,
+    balance DECIMAL(10, 2) DEFAULT 0.00,
+    payment_type VARCHAR(20) DEFAULT NULL,
+    payment_status ENUM('partially_paid', 'completed', 'uncredit') DEFAULT 'partially_paid',
+    FOREIGN KEY (job_sheet_id) REFERENCES job_sheets(id) ON DELETE CASCADE
+);
+
+alter table payment_records
+ADD COLUMN payment_type VARCHAR(20) DEFAULT NULL;
+
+ALTER TABLE payment_records
+MODIFY COLUMN payment_status ENUM('partially_paid', 'completed', 'credit_un') NOT NULL DEFAULT 'partially_paid';
+
+
+ALTER TABLE payment_records
+MODIFY COLUMN payment_status ENUM('partially_paid', 'completed', 'uncredit','incomplete') NOT NULL DEFAULT 'incomplete';
+
+
+ALTER TABLE users 
+MODIFY role ENUM('admin', 'super_admin', 'reception', 'ctp', 'accounts', 'multicolour', 'delivery', 'dispatch') NOT NULL;
+
+
+
+CREATE TABLE dispatch_jobs (
+    id INT PRIMARY KEY, -- Matches job_sheets.id
+    customer_name VARCHAR(255) NOT NULL,
+    job_name VARCHAR(255) NOT NULL,
+    total_charges DECIMAL(10, 2) NOT NULL,
+    description TEXT,
+    payment_status ENUM('incomplete', 'partially_paid', 'uncredit', 'completed') DEFAULT NULL,
+    balance DECIMAL(10, 2) NOT NULL,
+    dispatched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+
+ALTER TABLE job_sheets ADD COLUMN digital TINYINT DEFAULT 0;
+ALTER TABLE job_sheets ADD COLUMN completed_digital TINYINT DEFAULT 0;
+
+
+
+INSERT INTO users (username, password, role) 
+VALUES ('digital', 'digital', 'digital');
+
+ALTER TABLE users 
+MODIFY role ENUM('admin', 'super_admin', 'reception', 'ctp', 'accounts', 'multicolour', 'delivery', 'dispatch','digital') NOT NULL;
+
+
+
+CREATE TABLE jobsheet_progress_history (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    job_sheet_id INT NOT NULL,
+    stage VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (job_sheet_id) REFERENCES job_sheets(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE progress_stages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    stage_name VARCHAR(50) UNIQUE NOT NULL,
+    stage_order INT NOT NULL
+);
+
+INSERT INTO progress_stages (stage_name, stage_order) VALUES
+    ('Draft', 1),
+    ('Approved', 2),
+    ('Finalized', 3),
+    ('Sent to CTP', 4),
+    ('Completed CTP', 5),
+    ('Sent to Multicolour', 6),
+    ('Completed Multicolour', 7),
+    ('Sent to Digital', 8),
+    ('Completed Digital', 9),
+    ('Sent to Delivery', 10),
+    ('Dispatched', 11),
+    ('Completed', 12);
+    
+    
+    INSERT INTO jobsheet_progress_history (job_sheet_id, stage, created_at)
+SELECT id, 'Draft', created_at FROM job_sheets WHERE status = 'Draft'
+UNION
+SELECT id, 'Approved', created_at FROM job_sheets WHERE status = 'Approved'
+UNION
+SELECT id, 'Finalized', created_at FROM job_sheets WHERE status = 'Finalized'
+UNION
+SELECT id, 'Sent to CTP', created_at FROM job_sheets WHERE ctp = 1
+UNION
+SELECT id, 'Completed CTP', created_at FROM job_sheets WHERE completed_ctp = 1
+UNION
+SELECT id, 'Sent to Multicolour', created_at FROM job_sheets WHERE multicolour = 1
+UNION
+SELECT id, 'Completed Multicolour', created_at FROM job_sheets WHERE completed_multicolour = 1
+UNION
+SELECT id, 'Sent to Digital', created_at FROM job_sheets WHERE digital = 1
+UNION
+SELECT id, 'Completed Digital', created_at FROM job_sheets WHERE completed_digital = 1
+UNION
+SELECT id, 'Sent to Delivery', created_at FROM job_sheets WHERE completed_delivery = 1
+UNION
+SELECT js.id, 'Dispatched', dj.dispatched_at 
+FROM job_sheets js 
+JOIN dispatch_jobs dj ON js.id = dj.id
+UNION
+SELECT id, 'Completed', created_at FROM job_sheets WHERE completed = 1;
+
+DELIMITER //
+
+CREATE TRIGGER after_jobsheet_update
+AFTER UPDATE ON job_sheets
+FOR EACH ROW
+BEGIN
+    IF NEW.status != OLD.status THEN
+        INSERT INTO jobsheet_progress_history (job_sheet_id, stage)
+        VALUES (NEW.id, NEW.status);
+    END IF;
+    IF NEW.ctp = 1 AND OLD.ctp = 0 THEN
+        INSERT INTO jobsheet_progress_history (job_sheet_id, stage)
+        VALUES (NEW.id, 'Sent to CTP');
+    END IF;
+    IF NEW.completed_ctp = 1 AND OLD.completed_ctp = 0 THEN
+        INSERT INTO jobsheet_progress_history (job_sheet_id, stage)
+        VALUES (NEW.id, 'Completed CTP');
+    END IF;
+    IF NEW.multicolour = 1 AND OLD.multicolour = 0 THEN
+        INSERT INTO jobsheet_progress_history (job_sheet_id, stage)
+        VALUES (NEW.id, 'Sent to Multicolour');
+    END IF;
+    IF NEW.completed_multicolour = 1 AND OLD.completed_multicolour = 0 THEN
+        INSERT INTO jobsheet_progress_history (job_sheet_id, stage)
+        VALUES (NEW.id, 'Completed Multicolour');
+    END IF;
+    IF NEW.digital = 1 AND OLD.digital = 0 THEN
+        INSERT INTO jobsheet_progress_history (job_sheet_id, stage)
+        VALUES (NEW.id, 'Sent to Digital');
+    END IF;
+    IF NEW.completed_digital = 1 AND OLD.completed_digital = 0 THEN
+        INSERT INTO jobsheet_progress_history (job_sheet_id, stage)
+        VALUES (NEW.id, 'Completed Digital');
+    END IF;
+    IF NEW.completed_delivery = 1 AND OLD.completed_delivery = 0 THEN
+        INSERT INTO jobsheet_progress_history (job_sheet_id, stage)
+        VALUES (NEW.id, 'Sent to Delivery');
+    END IF;
+    IF NEW.completed = 1 AND OLD.completed = 0 THEN
+        INSERT INTO jobsheet_progress_history (job_sheet_id, stage)
+        VALUES (NEW.id, 'Completed');
+    END IF;
+END//
+
+CREATE TRIGGER after_dispatch_insert
+AFTER INSERT ON dispatch_jobs
+FOR EACH ROW
+BEGIN
+    INSERT INTO jobsheet_progress_history (job_sheet_id, stage)
+    VALUES (NEW.id, 'Dispatched');
+END//
+
+DELIMITER ;

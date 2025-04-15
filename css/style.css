@@ -1,0 +1,566 @@
+
+/************index.php styles******************/
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    text-align: center;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #0056b3;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.navbar .brand {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.nav-buttons button {
+    background-color: blue;
+    color: white;
+    padding: 10px;
+    margin: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+.nav-buttons button:hover {
+    background-color: darkblue;
+}
+
+/* Overlay */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+/* Login Popup */
+.login-popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    width: 380px;
+    text-align: center;
+    z-index: 1001;
+}
+
+.login-popup h2 {
+    margin-bottom: 20px;
+    color: #0056b3;
+    font-size: 22px;
+}
+
+.login-popup form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.login-popup input {
+    width: 85%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    text-align: left;
+}
+
+.login-popup button {
+    background-color: #0056b3;
+    color: white;
+    padding: 12px;
+    width: 50%;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.login-popup button:hover {
+    background-color: #003366;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 18px;
+    color: #777;
+    cursor: pointer;
+}
+
+.close-btn:hover {
+    color: black;
+}
+
+/*************admin.php*************/
+
+/************add_vendor.php************/
+/************add_edit_customer.php****************/
+/*************sales.php***************/
+
+/*vendor management*/
+.container {
+    background: white;
+    width: 50%;
+    margin: 30px auto;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.customer-container {
+    background: white;
+    width: 90%;
+    margin: 30px auto;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.container h2{
+    text-align: center;
+    color: #0056b3;
+    margin-bottom: 20px;
+}
+
+/***Add Form***/
+.form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+    margin-left:15px;
+    
+}
+
+.form-group input,input[type="number"],.invoice-details{    
+    width: 100%;
+    max-width:90%;
+    height:25px;
+    padding: 16px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-left:15px;
+}
+
+.form button {
+    width:100%;
+    max-width:70%;
+    background-color: #0056b3;
+    color: white;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-left:90px;
+}
+
+.form button:hover {
+    background-color: #003366;
+}
+
+.form-group select {
+    width: 100%;
+    max-width: 95%;
+    margin-left: 15px;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: white;
+    appearance: none; 
+}
+select{
+    width: 100%;
+    max-width: 94%;
+    margin-left: 15px;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: white;
+    appearance: none;
+}
+/* Search Section */
+.search-input {
+    width: 75%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-right: 10px;
+    margin-left:20px;
+}
+
+.search-btn {
+    padding: 12px 18px;
+    font-size: 16px;
+    background-color: #0056b3;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.search-btn:hover {
+    background-color: #003366;
+}
+
+.vendor-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 50%;
+    margin: 20px auto; /* Centers the card */
+    text-align: center;
+}
+
+.vendor-card strong {
+    font-size: 22px;
+    color: #333;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.vendor-card p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+.vendor-actions {
+    margin-top: 15px;
+}
+
+.edit-btn, .delete-btn {
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin: 5px;
+    width:auto;
+}
+
+.edit-btn {
+    background-color: green;
+    color: white;
+    height:32px;
+}
+
+.delete-btn {
+    background-color: red;
+    color: white;
+    height:32px;
+}
+
+.invoice-details {
+    height: 90px;
+    display: flex;
+    justify-content: space-around;
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+}
+
+/* #invoice_number {
+    background-color: red;
+} */
+/*****************************************Super_Admin***********************************/
+/***************add_user.php***************/
+/* Main Container - Centers Form & Users */
+.main-container {
+    display: flex;
+    flex-direction:row;
+    justify-content: space-between;
+    align-items:stretch;
+    max-width: 80%;
+    margin: 30px auto;
+    gap: 20px;
+}
+
+.main-container h2{
+    text-align: center;
+    color: #0056b3;
+    margin-bottom: 20px;
+}
+
+
+.user-container{
+    width:100%;
+    border-radius: 8px;
+    padding:20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background: white;
+    height: 400px; /* Set a fixed height */
+    overflow-y: auto; /* Enable vertical scroll if content exceeds height */
+}
+
+/* .user-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.user-card {
+    color:black;
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+    width: 100%;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+} */
+
+.delete-btn {
+    width:auto;
+    background: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+
+
+/***************super_inventory.php****************/
+/* General styling for inventory boxes */
+/* Parent Container */
+/* General Styles */
+.inventory-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: stretch;
+    width: 90%;
+    margin: 15px auto;
+    gap: 20px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 20px;
+}
+
+.inventory-box {
+    flex: 1;
+    width: 32%;
+    padding: 30px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    height: 400px;
+    overflow-y: auto;
+}
+
+.inventory-box h2 {
+    font-size: 22px;
+    font-weight: bold;
+    color: #0056b3;
+    margin-bottom: 15px;
+}
+
+.inventory-box label {
+    display: block;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+    text-align: left;
+}
+
+.inventory-box input,
+.inventory-box select {
+    width: 90%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    box-sizing: border-box; /* Ensure padding and border are included in the width */
+}
+
+.inventory-box button {
+    width: 90%;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.inventory-box button:hover {
+    background: #0056b3;
+}
+
+.category-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.category-card {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f5f5f5;
+    padding: 12px 18px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    height: 40px;
+}
+
+.category-card p {
+    flex: 2;
+    text-align: left;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+
+@media (max-width: 900px) {
+    .inventory-container {
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+    .inventory-box {
+        flex-shrink: 0;
+    }
+}
+
+/************New_Order.php************/
+.machine-selection, .customer-selection {
+    margin-bottom: 15px;
+}
+
+.machine-selection label,
+.customer-selection label {
+    margin-right: 15px;
+}
+
+.form-group {
+    margin-top: 10px;
+}
+
+.ctp-section, .ctp-plate-selection {
+    border-radius: 20px;
+    display: none;
+    margin-top: 15px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+}
+
+.plate-sizes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+#plateList {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+}
+
+.plate-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    border-bottom: 1px solid #ddd;
+}
+
+.plate-item button {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+select, input {
+    margin-top: 5px;
+}
+
+.container {
+    margin-bottom: 20px;
+}
+
+.customer-container {
+    display: block;
+    background-color:lightblue;
+}
+
+#ryobi-options, #web-options, #web-sub-options {
+    display: none;
+}
+
+#Job_Sheet_Btn {
+    width:100%;
+    max-width:60%;
+    background-color: #0056b3;
+    color: white;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-left:10px;
+}
+
+#Job_Sheet_Btn{
+    background-color: #003366;
+}
