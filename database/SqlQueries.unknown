@@ -127,6 +127,7 @@ FROM inventory_items;
 
 
 
+
 DELIMITER //
 
 CREATE TRIGGER update_active_status
@@ -145,6 +146,42 @@ SELECT VERSION();
 
 
 SELECT selling_price FROM sales_prices WHERE item_id = [your_item_id] LIMIT 1;payment_records
+
+
+CREATE TABLE departments (
+    department_id INT AUTO_INCREMENT PRIMARY KEY,
+    department_name VARCHAR(50) NOT NULL
+);
+
+INSERT INTO departments (department_name) VALUES
+('Office'),
+('Reception'),
+('Dispatch'),
+('Digital'),
+('CTP'),
+('Single color'),
+('Multi'),
+('Web'),
+('Lamination'),
+('Folding'),
+('Gumming'),
+('Binding'),
+('Others');
+
+CREATE TABLE stock_utilization (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    user VARCHAR(255),
+    item_id INTEGER,
+    item_name VARCHAR(255),
+    quantity_used DECIMAL(10,2),
+    unit VARCHAR(50),
+    department_id INTEGER,
+    customer_id INTEGER,
+    utilization_date DATETIME,
+    FOREIGN KEY (item_id) REFERENCES inventory_items_copy(id),
+    FOREIGN KEY (department_id) REFERENCES departments(department_id),
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
+);
 
 /*Vendors Table*/
 CREATE TABLE vendors(
